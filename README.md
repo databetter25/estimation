@@ -2,6 +2,8 @@
 
 점추정 이론(MME·MLE·UMVUE·CRLB)과 좋은 추정량의 조건(불편성·효율성·일치성·MSE)을 브라우저 시뮬레이션과 과녁 그림으로 배우는 정적 교육 사이트. 요구사항은 [PRD.md](PRD.md)에 있다.
 
+**사이트: https://databetter25.github.io/estimation/**
+
 ## 실행
 
 ```bash
