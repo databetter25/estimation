@@ -1,0 +1,37 @@
+---
+layout: ../../layouts/Chapter.astro
+title: "실험실: 정규분포 산포 σ²"
+path: lab/sigma2
+wide: true
+lead: X ~ N(10, σ²=4), n = 25. 불편추정량 S²와 편향이 있는 MLE σ̂² 중 MSE는 어느 쪽이 작을까? 편향-분산 절충(bias-variance trade-off)이 처음 등장하는 곳이다.
+---
+
+import Lab from '../../components/Lab.astro';
+import Question from '../../components/Question.astro';
+
+<Lab lab="sigma2" />
+
+## 결과 읽기
+
+| 추정량 | 기댓값 | 분산 | MSE ($n=25$, $\sigma^2=4$) |
+| --- | --- | --- | --- |
+| $S^2$ (UMVUE) | $\sigma^2$ | $\frac{2\sigma^4}{n-1}$ | 1.333 |
+| $\hat\sigma^2$ (MLE) | $\frac{n-1}{n}\sigma^2$ | $\frac{2(n-1)\sigma^4}{n^2}$ | 1.254 |
+
+- **$S^2$**는 편향이 없다. 하지만 분산이 $\hat\sigma^2$보다 크다.
+- **$\hat\sigma^2$**는 $\sigma^2/n = 0.16$만큼 과소추정한다. 그런데 분산이 줄어든 몫이 편향² $= 0.0256$보다 커서 **MSE는 $\hat\sigma^2$가 더 작다.**
+- 정규분포에서 이 관계는 **모든 $n$에서** 성립한다. $\mathrm{MSE}(\hat\sigma^2) = \frac{(2n-1)\sigma^4}{n^2} < \frac{2\sigma^4}{n-1} = \mathrm{MSE}(S^2)$. $n$이 커지면 차이가 줄어들 뿐이다.
+- **$\hat\sigma^2_{\mathrm{IQR}}$**는 이상치에 강한 대신 정규분포에서는 분산이 2배 넘게 크다. $n=25$에서는 평균이 약 3.76으로 아래쪽 편향도 있다(표준편차에 비해 작아 판정은 (c)).
+
+> 원천 자료는 $S^2$를 "(c) 성향"으로 분류했다. 하지만 $S^2$의 분산은 $\hat\sigma^2$보다 9% 클 뿐이라 판정 규칙으로는 (a)다. 요점은 분류가 아니라 **"불편이 최선은 아니다"**라는 것이다.
+
+<Question
+  q="$n$을 5로 줄이면, $S^2$와 $\hat\sigma^2$의 MSE 차이는?"
+  options={['줄어든다', '거의 그대로다', '커진다']}
+  answer={2}
+  explain="$n = 5$에서 $\mathrm{MSE}(S^2) = 2\cdot16/4 = 8$, $\mathrm{MSE}(\hat\sigma^2) = 9\cdot16/25 = 5.76$. 차이가 0.08에서 2.24로 커진다. 소표본일수록 분산을 줄이는 이득이 편향의 손해보다 크다."
+  apply={{ n: 5 }}
+  applyLabel="n = 5로 실행"
+/>
+
+더 나아가 $c\sum(X_i-\bar X)^2$ 꼴 전체에서 MSE를 최소로 만드는 상수는 $c = \frac{1}{n+1}$이다. 불편성($c = \frac{1}{n-1}$)도 MLE($c = \frac1n$)도 MSE 기준의 최적은 아니다.

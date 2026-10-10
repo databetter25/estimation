@@ -1,0 +1,113 @@
+---
+layout: ../../layouts/Chapter.astro
+title: 추정량 만드는 법
+path: learn/methods
+lead: 추정 이론의 개념은 두 범주로 나누면 명쾌해진다. 추정량을 찾아내는 방법론(constructive methods)과, 추정량이 도달해야 할 목표(optimality criteria)다.
+---
+
+import FlowDiagram from '../../components/FlowDiagram.astro';
+
+## 방법과 목표는 다른 범주다
+
+| 범주 | 개념 | 역할 |
+| --- | --- | --- |
+| **방법 (How to get)** | 적률추정법(Method of Moments Estimation, MME), 최대가능도추정법(Maximum Likelihood Estimation, MLE) | 데이터에서 모수의 추정값을 실제로 계산해 내는 알고리즘. 손이나 컴퓨터로 값을 얻는 도구다. |
+| **목표 (How good)** | 균일최소분산불편추정량(Uniformly Minimum Variance Unbiased Estimator, UMVUE) | 불편추정량 가운데 분산이 가장 작다는 이론적 최선의 상태. "더 이상 분산을 줄일 수 없다"는 품질 보증 마크에 가깝다. |
+
+MME와 MLE로 후보를 만들고, 충분성과 완비성을 이용해 그 후보를 UMVUE로 다듬는다. 전체 흐름은 다음과 같다.
+
+<FlowDiagram />
+
+## 1. 적률추정법 (MME)
+
+이론적 적률과 표본적률을 같다고 놓고 연립해 푼다. 1차 적률이라면
+
+$$
+E_\theta[X] = \bar{X}
+$$
+
+를 $\theta$에 대해 풀면 된다. 계산이 간단하고, 큰수의 법칙(Law of Large Numbers) 덕분에 일치성을 갖는다. 대신 대개 비효율적이다(분산이 크다). 실무에서는 초깃값이나 간단한 벤치마크로 자주 쓴다.
+
+> **균등분포 예**: $X \sim U(0,\theta)$이면 $E[X] = \theta/2$이므로 $\theta/2 = \bar{X}$, 즉 $\tilde\theta = 2\bar{X}$.
+
+## 2. 최대가능도추정법 (MLE)
+
+관측된 표본이 나올 가능도(likelihood)를 최대로 만드는 $\theta$를 고른다.
+
+$$
+\hat\theta_{\mathrm{MLE}} = \arg\max_\theta L(\theta \mid \mathbf{x}) = \arg\max_\theta \prod_{i=1}^n f(x_i \mid \theta)
+$$
+
+정칙조건(regularity conditions) 아래에서 MLE는 일치성, 점근적 정규성, 점근적 효율성을 가진다. 또 $g(\theta)$의 MLE는 그냥 $g(\hat\theta_{\mathrm{MLE}})$라는 **불변성(invariance)**도 있다.
+
+> **정규분포 예**: $N(\mu,\sigma^2)$에서 $\hat\mu = \bar{X}$, $\hat\sigma^2 = \frac{1}{n}\sum(X_i - \bar X)^2$. 분모가 $n$이라 $E[\hat\sigma^2] = \frac{n-1}{n}\sigma^2$로 **과소추정 편향**이 생긴다.
+>
+> **균등분포 예**: 가능도 $L(\theta) = \theta^{-n}\,\mathbb{1}(\theta \ge X_{(n)})$은 $\theta$가 작을수록 커지지만 $X_{(n)}$보다 작아질 수는 없다. 그래서 $\hat\theta_{\mathrm{MLE}} = X_{(n)}$. 항상 참값보다 작으므로 $E[X_{(n)}] = \frac{n}{n+1}\theta$로 음의 편향이 있다.
+
+## 3. 충분성과 완비성
+
+**충분통계량(Sufficient Statistic)** $T$는 $\theta$에 대한 정보를 손실 없이 담는다. 네이만 분해정리(Neyman Factorization Theorem)로 판별한다.
+
+$$
+f(\mathbf{x}\mid\theta) = g\big(T(\mathbf{x}) \mid \theta\big)\, h(\mathbf{x})
+$$
+
+**완비성(Completeness)**은 "$E_\theta[g(T)] = 0$이 모든 $\theta$에서 성립하면 $g(T) = 0$"이라는 성질이다. 지수족(exponential family)이라면 자연모수 공간이 열린 집합을 포함할 때 완비충분통계량이 바로 나온다.
+
+| 모형 | 완비충분통계량 |
+| --- | --- |
+| $N(\mu, \sigma^2)$ | $\left(\sum X_i,\ \sum X_i^2\right)$ |
+| $U(0, \theta)$ | $X_{(n)}$ |
+
+## 4. 라오-블랙웰 정리와 레만-셰페 정리
+
+**라오-블랙웰 정리(Rao-Blackwell Theorem)**: 아무 불편추정량 $W$를 충분통계량 $T$로 조건부화한 $E[W \mid T]$도 불편이고, 분산은 $W$보다 크지 않다.
+
+**레만-셰페 정리(Lehmann-Scheffé Theorem)**: $T$가 완비충분통계량이면, $T$의 함수이면서 불편인 추정량은 **유일한 UMVUE**다.
+
+그래서 실전 요령은 이렇다. MME나 MLE로 후보를 구하고, 그것이 완비충분통계량의 함수인지 본 뒤, 편향만 보정한다.
+
+- 정규분포: $\hat\sigma^2$에 $\frac{n}{n-1}$을 곱하면 $S^2 = \frac{1}{n-1}\sum(X_i-\bar X)^2$. 완비충분통계량의 함수이고 불편이므로 UMVUE.
+- 균등분포: $X_{(n)}$에 $\frac{n+1}{n}$을 곱하면 $\frac{n+1}{n}X_{(n)}$. 같은 이유로 UMVUE.
+- MLE가 이미 완비충분통계량의 함수이고 불편이면, 그 MLE가 곧 UMVUE다. 정규분포의 $\bar X$가 그렇다.
+
+<details>
+<summary>증명: 균등분포에서 X(n)의 완비성 (펼치기)</summary>
+
+$X_{(n)}$의 밀도는 $f_T(t) = n t^{n-1}/\theta^n$, $0 < t < \theta$이다. 모든 $\theta > 0$에서
+
+$$
+E_\theta[g(T)] = \frac{n}{\theta^n}\int_0^\theta g(t)\, t^{n-1}\, dt = 0
+$$
+
+이면 $\int_0^\theta g(t) t^{n-1} dt = 0$이 모든 $\theta$에서 성립한다. 양변을 $\theta$로 미분하면 $g(\theta)\theta^{n-1} = 0$, 즉 거의 모든 곳에서 $g = 0$이다. 따라서 $X_{(n)}$은 완비다.
+
+또 $E[X_{(n)}] = \int_0^\theta t \cdot n t^{n-1}/\theta^n\, dt = \frac{n}{n+1}\theta$이므로 $\frac{n+1}{n}X_{(n)}$은 불편이다.
+
+</details>
+
+## 5. 크래머-라오 하한 (CRLB)
+
+정칙조건 아래에서 불편추정량의 분산에는 넘을 수 없는 바닥이 있다. 크래머-라오 하한(Cramér-Rao Lower Bound, CRLB)이다.
+
+$$
+\mathrm{Var}(\hat\theta) \ge \frac{1}{I_n(\theta)}, \qquad I_n(\theta) = n\,E\left[\left(\frac{\partial}{\partial\theta}\log f(X\mid\theta)\right)^2\right]
+$$
+
+| 모형·모수 | CRLB | 달성하는 추정량 |
+| --- | --- | --- |
+| $N(\mu,\sigma^2)$의 $\mu$ | $\sigma^2/n$ | $\bar X$ (정확히 달성) |
+| $N(\mu,\sigma^2)$의 $\sigma^2$ | $2\sigma^4/n$ | 없음. UMVUE $S^2$의 분산은 $2\sigma^4/(n-1)$ |
+| $U(0,\theta)$의 $\theta$ | 적용 불가 | 지지집합이 $\theta$에 의존해 정칙조건이 깨진다 |
+
+마지막 줄이 흥미롭다. 균등분포의 UMVUE는 분산이 $O(1/n^2)$로 줄어, "보통의" $1/n$ 속도보다 훨씬 빠르다. [5장 일치성](/consistency)에서 그래프로 확인할 수 있다.
+
+## 정리: 두 대표 모형
+
+| | $N(\mu,\sigma^2)$의 $\mu$ | $N(\mu,\sigma^2)$의 $\sigma^2$ | $U(0,\theta)$의 $\theta$ |
+| --- | --- | --- | --- |
+| MME | $\bar X$ | $\hat\sigma^2$ | $2\bar X$ |
+| MLE | $\bar X$ | $\hat\sigma^2 = \frac1n\sum(X_i-\bar X)^2$ (편향) | $X_{(n)}$ (편향) |
+| UMVUE | $\bar X$ | $S^2 = \frac{1}{n-1}\sum(X_i-\bar X)^2$ | $\frac{n+1}{n}X_{(n)}$ |
+
+이 표의 추정량들이 과녁 위에서 어떻게 보이는지가 다음 장의 주제다.

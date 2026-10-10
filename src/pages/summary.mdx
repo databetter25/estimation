@@ -1,0 +1,63 @@
+---
+layout: ../layouts/Chapter.astro
+title: "정리: MLE와 성질 기반 접근"
+path: summary
+lead: 불편성·일치성·효율성은 합격 기준이고, MLE는 그 합격품을 만들어 내는 강력한 생산 공정이다. 둘의 관계와 긴장을 정리한다.
+---
+
+## 범주의 차이
+
+- **불편성·일치성·효율성**: 추정량이 손에 쥐어졌을 때 그것을 검사하는 **평가 기준**이다. 하지만 이 기준을 만족하는 식을 어떻게 만들지는 알려 주지 않는다.
+- **최대가능도추정법(MLE)**: "관측된 데이터가 나올 가능도를 최대로 만드는 $\theta$를 찾는다"는 하나의 명확한 **도출 기법**이다. $\frac{\partial}{\partial\theta}\log L(\theta \mid \mathbf{x}) = 0$을 풀면 어떤 분포에서든 기계적으로 답을 얻는다.
+
+## MLE가 사랑받는 이유
+
+정칙조건만 만족하면 MLE는 바람직한 성질을 **종합선물세트처럼** 자동으로 갖춘다.
+
+1. **일치성**: $\hat\theta_{\mathrm{MLE}} \xrightarrow{p} \theta_0$
+2. **점근적 정규성**: $\sqrt{n}\,(\hat\theta_{\mathrm{MLE}} - \theta_0) \xrightarrow{d} N\!\left(0, \frac{1}{I(\theta_0)}\right)$
+3. **점근적 효율성**: 대표본에서 분산이 크래머-라오 하한(CRLB)에 도달한다
+
+일치하고 효율적인 추정량을 모형마다 머리를 싸매고 찾지 않아도, 가능도 함수를 최대화하기만 하면 그 성질이 딸려 나온다.
+
+## 그러나 긴장도 있다
+
+| 쟁점 | 성질 기반 접근 (UMVUE) | MLE |
+| --- | --- | --- |
+| 유한 표본의 편향 | 불편성이 목표이므로 보장 | 보장하지 않음 ($\hat\sigma^2$는 $\frac{n-1}{n}\sigma^2$로 과소추정) |
+| 계산과 존재 | 완비충분통계량이 없거나 조건부 기댓값 계산이 불가능한 경우가 많다 | 닫힌 해가 없어도 경사하강법, EM 알고리즘 같은 수치최적화로 답을 낸다 |
+| 변환 $g(\theta)$ | $E[g(\hat\theta)] \ne g(E[\hat\theta])$이므로 불편성이 깨져 새로 유도해야 한다 | $g(\theta)$의 MLE는 그냥 $g(\hat\theta_{\mathrm{MLE}})$ (불변성) |
+| MSE | 불편추정량 중 최소이지만 MSE 최소는 아닐 수 있다 | 편향이 있어도 MSE가 더 작을 수 있다 |
+
+현대 딥러닝과 대규모 통계 모형이 손실함수 최소화, 즉 MLE 계열에 의존하는 결정적 이유가 두 번째 줄이다.
+
+## 요약
+
+- **성질 기반 접근**: "좋은 추정량이란 무엇인가?"라는 **목표와 평가 잣대**를 세운다.
+- **MLE**: 그 평가 항목들, 특히 대표본의 일치성과 효율성을 가장 높은 확률로 한 번에 달성하는 실용적인 **만능 엔진**이다.
+- **이 사이트에서 본 것**: 불편이라고 MSE가 가장 작은 것은 아니고(σ²), 편향이 있으면 손해일 때도 있으며(θ), 최적 추정량도 가정이 깨지면 무너진다(코시).
+
+## 용어집
+
+| 용어 | 뜻 |
+| --- | --- |
+| 통계량(Statistic) | 미지의 모수를 포함하지 않는 표본의 함수 |
+| 추정량(Estimator) | 특정 모수를 추정하려는 목적을 가진 통계량 |
+| 편향(Bias) | $E[\hat\theta] - \theta$ |
+| 평균제곱오차(Mean Squared Error, MSE) | $E[(\hat\theta-\theta)^2] = \mathrm{Var} + \mathrm{Bias}^2$ |
+| 적률추정법(Method of Moments Estimation, MME) | 표본적률을 모적률과 같다고 놓고 푸는 방법 |
+| 최대가능도추정법(Maximum Likelihood Estimation, MLE) | 가능도를 최대화하는 모수값을 고르는 방법 |
+| 충분통계량(Sufficient Statistic) | 모수에 대한 정보를 손실 없이 담는 통계량 |
+| 완비성(Completeness) | $E_\theta[g(T)]=0\ \forall\theta \Rightarrow g(T)=0$ |
+| 균일최소분산불편추정량(Uniformly Minimum Variance Unbiased Estimator, UMVUE) | 모든 $\theta$에서 불편추정량 중 분산이 가장 작은 추정량 |
+| 크래머-라오 하한(Cramér-Rao Lower Bound, CRLB) | 정칙조건 아래 불편추정량 분산의 하한 $1/I_n(\theta)$ |
+| 피셔 정보량(Fisher Information) | $I(\theta) = E[(\partial_\theta \log f(X\mid\theta))^2]$ |
+| 상대효율(Relative Efficiency) | 두 추정량의 분산 비 |
+| 일치성(Consistency) | $n\to\infty$에서 참값으로 확률수렴 |
+| 강건성(Robustness) | 가정 위반이나 이상치에도 성능이 크게 나빠지지 않는 성질 |
+
+## 참고문헌
+
+- Casella, G. & Berger, R. L. *Statistical Inference* (2nd ed.). Duxbury, 2002. 7장.
+- Lehmann, E. L. & Casella, G. *Theory of Point Estimation* (2nd ed.). Springer, 1998.
+- Hogg, R. V., McKean, J. W. & Craig, A. T. *Introduction to Mathematical Statistics* (8th ed.). Pearson, 2019.

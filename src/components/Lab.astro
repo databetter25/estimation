@@ -1,0 +1,691 @@
+---
+import { LABS, type LabId, N_MAX, B_MIN, B_MAX } from '../data/labs';
+import { ESTIMATOR_META } from '../data/estimators';
+import { tex, texText } from '../lib/tex';
+
+interface Props {
+  lab: LabId;
+}
+const { lab } = Astro.props;
+const def = LABS[lab];
+const metas = def.estimators.map((id) => ESTIMATOR_META[id]);
+const B_OPTIONS = [500, 1000, 2000, 5000, 10000, 20000];
+---
+
+<section class="lab" data-lab={lab} aria-label="시뮬레이션 실험실">
+  <div class="lab-grid">
+    <!-- ───────── 컨트롤 (LAB-1) ───────── -->
+    <form class="lab-controls" novalidate>
+      <h2 class="ctl-title">실험 설정</h2>
+
+      {
+        def.distOptions && (
+          <fieldset class="ctl-group">
+            <legend>모집단 분포</legend>
+            <div class="tab-nav dist-tabs" role="group" aria-label="모집단 분포">
+              {def.distOptions.map((d, i) => (
+                <button type="button" class="tab-btn" data-dist={d.key} aria-pressed={i === 0 ? 'true' : 'false'} title={d.hint}>
+                  {d.label}
+                </button>
+              ))}
+            </div>
+            <p class="ctl-hint" data-dist-hint>{def.distOptions[0].hint}</p>
+          </fieldset>
+        )
+      }
+
+      {
+        def.params.length > 0 && (
+          <fieldset class="ctl-group">
+            <legend>모수</legend>
+            {def.params.map((p) => (
+              <label class="ctl-row">
+                <span class="ctl-label">
+                  {p.name} <span set:html={tex(p.tex)} />
+                </span>
+                <input type="number" name={`p_${p.key}`} min={p.min} max={p.max} step={p.step} value={p.default} inputmode="decimal" />
+              </label>
+            ))}
+            <p class="ctl-hint">
+              모집단: {lab === 'uniform' ? <span set:html={tex('U(0,\\theta)')} /> : <span set:html={tex('N(\\mu,\\sigma^2)')} />}
+            </p>
+          </fieldset>
+        )
+      }
+
+      <fieldset class="ctl-group">
+        <legend>표본과 반복</legend>
+        <label class="ctl-row">
+          <span class="ctl-label">표본 크기 <span set:html={tex('n')} /></span>
+          <input type="number" name="n" min={def.nMin} max={N_MAX} step="1" value={def.defaults.n} inputmode="numeric" />
+        </label>
+        <input type="range" name="n_range" min={def.nMin} max="200" step="1" value={def.defaults.n} aria-label="표본 크기 슬라이더" />
+        <label class="ctl-row">
+          <span class="ctl-label">반복 횟수 <span set:html={tex('B')} /></span>
+          <select name="B">
+            {B_OPTIONS.map((b) => <option value={b} selected={b === def.defaults.B}>{b.toLocaleString('ko-KR')}</option>)}
+          </select>
+        </label>
+        <label class="ctl-row">
+          <span class="ctl-label">시드</span>
+          <input type="number" name="seed" min="0" max="4294967295" step="1" value={def.defaults.seed} inputmode="numeric" />
+        </label>
+      </fieldset>
+
+      <fieldset class="ctl-group">
+        <legend>보여 줄 추정량</legend>
+        {
+          metas.map((m) => (
+            <label class="ctl-check">
+              <input type="checkbox" name="show" value={m.id} checked />
+              <span set:html={tex(m.tex)} />
+              <span class="ctl-check-name">{m.name}</span>
+            </label>
+          ))
+        }
+      </fieldset>
+
+      <div class="ctl-actions">
+        <button type="submit" class="btn-filled" data-run>실행</button>
+        <button type="button" class="btn-outline" data-reseed title="시드를 바꿔 새 표본을 뽑는다">다시 뽑기</button>
+      </div>
+      <div class="prog-track" aria-hidden="true"><div class="prog-fill" data-progress></div></div>
+      <button type="button" class="btn-ghost share" data-share>설정 링크 복사</button>
+      <p class="ctl-hint" data-share-msg aria-live="polite"></p>
+      <input type="hidden" name="B_min" value={B_MIN} />
+      <input type="hidden" name="B_max" value={B_MAX} />
+    </form>
+
+    <!-- ───────── 결과 ───────── -->
+    <div class="lab-results">
+      <p class="status" data-status aria-live="polite">실행 준비 중…</p>
+
+      <div class="legend-row">
+        <span class="lg"><i class="lg-dot"></i>탄착점 (추정치 2개 = 1점)</span>
+        <span class="lg"><i class="lg-center"></i>탄착군 중심 = 평균</span>
+        <span class="lg"><i class="lg-ring"></i>1 표준편차</span>
+        <span class="lg"><i class="lg-true"></i>정중앙 = 참값 <span set:html={tex(def.paramTex)} /></span>
+      </div>
+      <details class="why">
+        <summary>왜 추정치를 두 개씩 묶나요?</summary>
+        <p>
+          추정치 <span set:html={tex('\\hat\\theta')} />는 숫자 하나라서 그대로는 과녁(평면)에 찍을 수 없습니다. 그래서 반복 결과를
+          순서대로 짝지어 <span set:html={tex('(\\hat\\theta^{(2k-1)}-\\theta,\\ \\hat\\theta^{(2k)}-\\theta)')} />를 한 점으로 찍습니다.
+          두 값은 서로 독립인 표본에서 나왔으므로, 탄착군의 중심은 <span set:html={tex('(\\mathrm{Bias},\\mathrm{Bias})')} />,
+          가로·세로 퍼짐은 모두 <span set:html={tex('\\mathrm{SD}(\\hat\\theta)')} />가 됩니다. 즉 중심이 대각선 방향으로 밀려나 있으면
+          편향, 넓게 퍼져 있으면 분산이 큰 것입니다. 동심원 간격은 한 실험 안의 모든 과녁에서 같습니다.
+        </p>
+      </details>
+
+      <div class="cards" data-cards>
+        {
+          metas.map((m) => (
+            <article class="est-card" data-est={m.id}>
+              <header class="est-head">
+                <div class="est-sym" set:html={tex(m.tex)} />
+                <div class="est-name">
+                  {m.name}
+                  <span class="est-method">{m.method}</span>
+                </div>
+                <span class="badge badge-gray" data-type>—</span>
+              </header>
+              <div class="target-wrap">
+                <canvas class="target" role="img" aria-label={`${m.name}의 과녁 탄착군`} />
+                <span class="outside" data-outside hidden />
+              </div>
+              <canvas class="hist" role="img" aria-label={`${m.name}의 표본분포 히스토그램`} />
+              <dl class="mini">
+                <div><dt>편향</dt><dd data-k="bias">—</dd></div>
+                <div><dt>분산</dt><dd data-k="variance">—</dd></div>
+                <div><dt>MSE</dt><dd data-k="mse">—</dd></div>
+              </dl>
+            </article>
+          ))
+        }
+      </div>
+      <p class="hist-legend">
+        히스토그램: <i class="lg-line solid"></i>참값 <i class="lg-line dashed"></i>추정치 평균
+      </p>
+
+      <!-- MSE 분해 (VIZ-2) -->
+      <section class="panel">
+        <h3 class="panel-title">MSE 분해: <span set:html={tex('\\mathrm{MSE} = \\mathrm{Var} + \\mathrm{Bias}^2')} /></h3>
+        <div class="legend-row">
+          <span class="lg"><i class="sw sw-var"></i>분산 (Var)</span>
+          <span class="lg"><i class="sw sw-bias"></i>편향² (Bias²)</span>
+        </div>
+        <div class="mse-bars" data-mse>
+          {
+            metas.map((m) => (
+              <div class="mse-row" data-est={m.id}>
+                <div class="mse-label" set:html={tex(m.tex)} />
+                <div class="mse-track">
+                  <div class="mse-seg var" />
+                  <div class="mse-seg bias" />
+                  <span class="mse-cap" hidden>≫</span>
+                </div>
+                <div class="mse-val" data-k="mse">—</div>
+              </div>
+            ))
+          }
+        </div>
+      </section>
+
+      <!-- 지표 표 (VIZ-3, VIZ-4) -->
+      <section class="panel">
+        <h3 class="panel-title">지표 표</h3>
+        <div class="table-scroll">
+          <table class="metrics">
+            <thead>
+              <tr>
+                <th scope="col">추정량</th>
+                <th scope="col">유형</th>
+                <th scope="col">평균</th>
+                <th scope="col">편향</th>
+                <th scope="col">분산</th>
+                <th scope="col">MSE ± MC 오차</th>
+                <th scope="col">이론 MSE</th>
+                <th scope="col">상대효율</th>
+              </tr>
+            </thead>
+            <tbody>
+              {
+                metas.map((m) => (
+                  <tr data-est={m.id}>
+                    <th scope="row" set:html={tex(m.tex)} />
+                    <td data-k="type">—</td>
+                    <td data-k="mean">—</td>
+                    <td data-k="bias">—</td>
+                    <td data-k="variance">—</td>
+                    <td data-k="mse">—</td>
+                    <td data-k="theory">—</td>
+                    <td data-k="releff">—</td>
+                  </tr>
+                ))
+              }
+            </tbody>
+          </table>
+        </div>
+        <p class="table-note" data-crlb></p>
+        <p class="table-note">
+          분산은 <span set:html={tex('B')} />로 나눈 값이라 분산 + 편향²이 MSE와 정확히 같습니다. 상대효율 =
+          <span set:html={tex(`\\mathrm{Var}(${ESTIMATOR_META[def.reference].tex}) / \\mathrm{Var}(\\hat\\theta)`)} /> (1보다 작으면 기준보다 덜
+          효율적). 유형 판정 규칙: 편향이 MC 표준오차의 2배를 넘고 표준편차의 20%를 넘으면 "편향", 분산이 이 실험 최소분산의 1.2배
+          이하면 "고효율". ≈ 표시 이론값은 점근 근사식.
+        </p>
+      </section>
+    </div>
+  </div>
+
+  <!-- 추정량 카드 (LAB-3) -->
+  <section class="est-explain">
+    <h3 class="panel-title">비교하는 추정량</h3>
+    <div class="explain-grid">
+      {
+        metas.map((m) => (
+          <article class="feat-card explain-card">
+            <div class="explain-head">
+              <span class="est-name">{m.name}</span>
+              <span class="badge badge-blue">{m.method}</span>
+            </div>
+            <div class="explain-formula" set:html={tex(m.formula, true)} />
+            <p class="explain-note" set:html={texText(m.note)} />
+          </article>
+        ))
+      }
+    </div>
+  </section>
+</section>
+
+<script>
+  import { initLab } from '../lib/ui/lab';
+  document.querySelectorAll<HTMLElement>('.lab[data-lab]').forEach((el) => initLab(el));
+</script>
+
+<style is:global>
+  .lab {
+    margin: 32px 0 0;
+  }
+  .lab-grid {
+    display: grid;
+    grid-template-columns: 260px minmax(0, 1fr);
+    gap: 28px;
+    align-items: start;
+  }
+  @media (max-width: 860px) {
+    .lab-grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+  .lab-grid > * {
+    min-width: 0;
+  }
+  .lab-controls {
+    position: sticky;
+    top: 68px;
+    background: var(--c-bg);
+    border: 1px solid var(--c-border-lt);
+    border-radius: var(--r-lg);
+    padding: 22px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  @media (max-width: 860px) {
+    .lab-controls {
+      position: static;
+    }
+  }
+  .ctl-title {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: var(--fw-semibold);
+  }
+  .ctl-group {
+    border: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .ctl-group legend {
+    font-size: 0.72rem;
+    font-weight: var(--fw-semibold);
+    letter-spacing: 1px;
+    color: var(--c-text-tertiary);
+    margin-bottom: 6px;
+    padding: 0;
+  }
+  .ctl-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    font-size: 0.86rem;
+  }
+  .ctl-row input,
+  .ctl-row select {
+    width: 104px;
+    font: inherit;
+    font-size: 0.86rem;
+    padding: 6px 10px;
+    border: 1px solid var(--c-border);
+    border-radius: var(--r-sm);
+    background: var(--c-bg);
+    color: var(--c-text-primary);
+    font-variant-numeric: tabular-nums;
+  }
+  .ctl-row input[aria-invalid='true'] {
+    border-color: var(--c-red);
+  }
+  .lab-controls input[type='range'] {
+    width: 100%;
+    accent-color: var(--c-blue);
+  }
+  .ctl-hint {
+    font-size: 0.76rem;
+    color: var(--c-text-secondary);
+    margin: 0;
+    line-height: 1.5;
+  }
+  .ctl-check {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.84rem;
+    cursor: pointer;
+  }
+  .ctl-check input {
+    accent-color: var(--c-blue);
+    width: 16px;
+    height: 16px;
+  }
+  .ctl-check-name {
+    color: var(--c-text-secondary);
+    font-size: 0.78rem;
+  }
+  .ctl-actions {
+    display: flex;
+    gap: 8px;
+  }
+  .ctl-actions .btn-filled,
+  .ctl-actions .btn-outline {
+    flex: 1;
+    justify-content: center;
+    padding: 11px 12px;
+  }
+  .dist-tabs .tab-btn {
+    padding: 7px 12px;
+    font-size: 0.8rem;
+  }
+  .share {
+    align-self: flex-start;
+    font-size: 0.84rem;
+    padding: 4px 0;
+  }
+
+  .status {
+    font-size: 0.84rem;
+    color: var(--c-text-secondary);
+    margin: 0 0 10px;
+    font-variant-numeric: tabular-nums;
+  }
+  .legend-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 18px;
+    font-size: 0.8rem;
+    color: var(--c-text-secondary);
+    margin-bottom: 8px;
+  }
+  .lg {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .lg-dot,
+  .lg-center,
+  .lg-ring,
+  .lg-true,
+  .sw {
+    display: inline-block;
+    flex: none;
+  }
+  .lg-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--viz-s1);
+  }
+  .lg-center {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--viz-ink);
+    box-shadow: 0 0 0 2px var(--viz-surface);
+  }
+  .lg-ring {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 2px dashed var(--viz-ink);
+  }
+  .lg-true {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--viz-ink-2);
+  }
+  .lg-line {
+    display: inline-block;
+    width: 18px;
+    height: 0;
+    border-top: 2px solid var(--viz-ink);
+    vertical-align: middle;
+    margin: 0 4px 0 10px;
+  }
+  .lg-line.dashed {
+    border-top: 2px dashed var(--viz-s2);
+  }
+  .sw {
+    width: 14px;
+    height: 10px;
+    border-radius: 3px;
+  }
+  .sw-var {
+    background: var(--viz-s1);
+  }
+  .sw-bias {
+    background: var(--viz-s2);
+  }
+  .why {
+    font-size: 0.86rem;
+    color: var(--c-text-secondary);
+    margin: 4px 0 16px;
+  }
+  .why summary {
+    cursor: pointer;
+    color: var(--c-blue);
+    font-weight: var(--fw-medium);
+  }
+  .why p {
+    margin: 8px 0 0;
+    line-height: 1.75;
+  }
+
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 16px;
+  }
+  .lab[data-lab='sigma2'] .cards,
+  .lab[data-lab='uniform'] .cards,
+  .lab[data-lab='robust'] .cards {
+    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  }
+  .est-card {
+    background: var(--c-bg);
+    border: 1px solid var(--c-border-lt);
+    border-radius: var(--r-lg);
+    padding: 14px 14px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    transition: box-shadow var(--dur-base), border-color var(--dur-base);
+  }
+  .est-card:hover {
+    box-shadow: var(--s-sm);
+    border-color: var(--c-border);
+  }
+  .est-card[hidden],
+  .mse-row[hidden],
+  tr[hidden] {
+    display: none;
+  }
+  .est-head {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-rows: auto auto;
+    column-gap: 10px;
+    align-items: center;
+  }
+  .est-sym {
+    font-size: 1.15rem;
+    grid-row: span 2;
+  }
+  .est-name {
+    font-size: 0.86rem;
+    font-weight: var(--fw-semibold);
+    line-height: 1.35;
+  }
+  .est-method {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: var(--fw-regular);
+    color: var(--c-text-tertiary);
+  }
+  .est-head .badge {
+    grid-column: 2;
+    justify-self: start;
+    margin-top: 4px;
+  }
+  .target-wrap {
+    position: relative;
+  }
+  canvas.target,
+  canvas.hist {
+    display: block;
+    width: 100%;
+    touch-action: pan-y;
+  }
+  .outside {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    font-size: 0.7rem;
+    color: var(--c-text-secondary);
+    background: var(--c-bg);
+    border: 1px solid var(--c-border-lt);
+    border-radius: var(--r-pill);
+    padding: 2px 8px;
+  }
+  .mini {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--c-border-lt);
+    border-radius: var(--r-sm);
+    overflow: hidden;
+    margin: 0;
+  }
+  .mini div {
+    background: var(--c-bg-subtle);
+    padding: 6px 8px;
+    text-align: center;
+  }
+  .mini dt {
+    font-size: 0.66rem;
+    color: var(--c-text-tertiary);
+  }
+  .mini dd {
+    margin: 0;
+    font-size: 0.86rem;
+    font-weight: var(--fw-semibold);
+    font-variant-numeric: tabular-nums;
+  }
+  .hist-legend {
+    font-size: 0.78rem;
+    color: var(--c-text-secondary);
+    margin: 10px 0 0;
+  }
+
+  .panel {
+    margin-top: 32px;
+    background: var(--c-bg);
+    border: 1px solid var(--c-border-lt);
+    border-radius: var(--r-lg);
+    padding: 22px 22px 18px;
+  }
+  .panel-title {
+    font-size: 1.05rem;
+    font-weight: var(--fw-semibold);
+    margin: 0 0 12px;
+  }
+  .mse-bars {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 8px;
+  }
+  .mse-row {
+    display: grid;
+    grid-template-columns: 96px 1fr 72px;
+    align-items: center;
+    gap: 12px;
+  }
+  .mse-label {
+    font-size: 0.95rem;
+    text-align: right;
+  }
+  .mse-track {
+    position: relative;
+    display: flex;
+    gap: 2px;
+    height: 22px;
+    cursor: default;
+  }
+  .mse-seg {
+    height: 100%;
+    width: 0;
+    transition: width var(--dur-slow) var(--ease-spring);
+  }
+  .mse-seg.var {
+    background: var(--viz-s1);
+    border-radius: 4px 0 0 4px;
+  }
+  .mse-seg.bias {
+    background: var(--viz-s2);
+    border-radius: 0 4px 4px 0;
+  }
+  .mse-seg.var:last-of-type,
+  .mse-seg.var.solo {
+    border-radius: 4px;
+  }
+  .mse-cap {
+    align-self: center;
+    font-size: 0.8rem;
+    color: var(--c-text-secondary);
+    margin-left: 4px;
+  }
+  .mse-val {
+    font-size: 0.86rem;
+    font-weight: var(--fw-semibold);
+    font-variant-numeric: tabular-nums;
+  }
+  .table-scroll {
+    overflow-x: auto;
+  }
+  table.metrics {
+    display: table;
+    margin: 0;
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.84rem;
+    font-variant-numeric: tabular-nums;
+  }
+  table.metrics th,
+  table.metrics td {
+    padding: 9px 10px;
+    border-bottom: 1px solid var(--c-border-lt);
+    text-align: right;
+    white-space: nowrap;
+  }
+  table.metrics thead th {
+    font-size: 0.74rem;
+    font-weight: var(--fw-semibold);
+    color: var(--c-text-secondary);
+  }
+  table.metrics th[scope='row'],
+  table.metrics thead th:first-child {
+    text-align: left;
+  }
+  table.metrics td[data-k='type'] {
+    text-align: center;
+  }
+  .table-note {
+    font-size: 0.78rem;
+    color: var(--c-text-secondary);
+    line-height: 1.65;
+    margin: 12px 0 0;
+  }
+
+  .est-explain {
+    margin-top: 48px;
+  }
+  .explain-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+  }
+  .explain-card {
+    padding: 24px 22px;
+  }
+  .explain-head {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+  }
+  .explain-formula {
+    overflow-x: auto;
+    font-size: 0.95rem;
+  }
+  .explain-note {
+    font-size: 0.86rem;
+    color: var(--c-text-secondary);
+    line-height: 1.75;
+    margin: 0;
+  }
+</style>

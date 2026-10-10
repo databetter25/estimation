@@ -1,0 +1,10 @@
+---
+/** 수식 컴포넌트: <M t="\bar X" /> 또는 <M t="..." block /> */
+import { tex } from '../lib/tex';
+interface Props {
+  t: string;
+  block?: boolean;
+}
+const { t, block = false } = Astro.props;
+---
+{block ? <div class="katex-display-wrap" set:html={tex(t, true)} /> : <span set:html={tex(t)} />}

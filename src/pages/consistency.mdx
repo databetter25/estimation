@@ -1,0 +1,24 @@
+---
+layout: ../layouts/Chapter.astro
+title: 일치성
+path: consistency
+wide: true
+lead: 일치성(consistency)은 표본이 커질 때 추정량이 참값으로 확률수렴한다는 성질이다. 소표본의 편향은 사라지는가? 얼마나 빨리 모이는가? 표본 크기를 10에서 1,000까지 늘려 확인한다.
+---
+
+import Consistency from '../components/Consistency.astro';
+
+$$
+\hat\theta_n \xrightarrow{p} \theta \quad\Longleftrightarrow\quad \lim_{n\to\infty} P\big(|\hat\theta_n - \theta| > \varepsilon\big) = 0 \ \text{ for all } \varepsilon > 0
+$$
+
+MSE가 0으로 가면 일치성이 성립한다(체비쇼프 부등식). 그래서 아래 실험은 분포가 참값으로 좁아지는 모습과 MSE가 줄어드는 속도를 함께 본다.
+
+<Consistency />
+
+## 결과 읽기
+
+- **편향의 소멸**: $\hat\sigma^2$의 편향은 $-\sigma^2/n$이다. $n = 10$에서 $-0.4$였던 편향이 $n = 1000$에서 $-0.004$가 된다. 이것이 점근적 불편성(asymptotic unbiasedness)이다. $n$이 커지면 두 곡선은 거의 겹친다.
+- **MSE 비율**: $\mathrm{MSE}(\hat\sigma^2)/\mathrm{MSE}(S^2) = \frac{(2n-1)(n-1)}{2n^2}$는 언제나 1보다 작지만, $n$이 커질수록 1에 다가간다. 대표본에서는 둘의 차이가 의미 없어진다.
+- **수렴 속도**: 정규분포의 분산 추정량과 균등분포의 $2\bar X$는 기울기 −1, 즉 $1/n$ 속도로 줄어든다. 균등분포의 $X_{(n)}$과 UMVUE는 기울기 −2, 즉 $1/n^2$ 속도다. 정칙조건이 깨진 모형에서는 "보통의" 속도보다 빠른 추정이 가능하다.
+- MLE $X_{(n)}$은 편향이 있어도 편향² $\theta^2/(n+1)^2$ 자체가 $1/n^2$로 줄기 때문에 기울기 −2를 유지한다.

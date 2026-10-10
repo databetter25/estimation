@@ -1,0 +1,36 @@
+---
+layout: ../../layouts/Chapter.astro
+title: "실험실: 균등분포 상한 θ"
+path: lab/uniform
+wide: true
+lead: X ~ U(0, θ=10), n = 20. 비정규 모형에서 MME, MLE, UMVUE가 과녁 (c), (b), (a)에 정확히 하나씩 대응한다.
+---
+
+import Lab from '../../components/Lab.astro';
+import Question from '../../components/Question.astro';
+
+<Lab lab="uniform" />
+
+## 결과 읽기
+
+| 추정량 | 기댓값 | 분산 | MSE ($n=20$, $\theta=10$) | 과녁 |
+| --- | --- | --- | --- | --- |
+| $\frac{n+1}{n}X_{(n)}$ (UMVUE) | $\theta$ | $\frac{\theta^2}{n(n+2)}$ | 0.227 | (a) |
+| $X_{(n)}$ (MLE) | $\frac{n}{n+1}\theta$ | $\frac{n\theta^2}{(n+1)^2(n+2)}$ | 0.433 | (b) |
+| $2\bar X$ (MME) | $\theta$ | $\frac{\theta^2}{3n}$ | 1.667 | (c) |
+
+- **$2\bar X$**는 불편이지만 최댓값의 정보를 쓰지 못해 분산이 $O(1/n)$으로 크다.
+- **$X_{(n)}$**은 항상 $\theta$보다 작다. 편향 $-\theta/(n+1) \approx -0.48$이 MSE의 절반 이상을 차지한다.
+- **UMVUE**는 $X_{(n)}$을 $\frac{n+1}{n}$배 늘려 편향을 없앤 것이다. 분산이 조금 늘지만 편향² $0.227$을 지운 이득이 훨씬 크다.
+- 이 모형은 지지집합이 $\theta$에 의존하므로 크래머-라오 하한(CRLB)의 정칙조건이 깨진다. 그래서 UMVUE의 분산이 $O(1/n^2)$로, 보통의 $1/n$보다 빠르게 줄어든다.
+
+> 원천 설계안의 지표 표는 이 세 추정량의 분산을 약 10배 작게 적었다(0.02, 0.02, 0.17). 위 표는 이론값이고, 실험실 결과도 이 값과 맞는다.
+
+<Question
+  q="$n$을 20에서 40으로 두 배 늘리면, MSE는 각각 대략 몇 분의 1로 줄까?"
+  options={['둘 다 1/2', '$2\\bar X$는 1/2, UMVUE는 약 1/4', '둘 다 약 1/4']}
+  answer={1}
+  explain="$\mathrm{MSE}(2\bar X) = \theta^2/(3n)$은 $1/n$ 속도, UMVUE는 $\theta^2/(n(n+2))$로 $1/n^2$ 속도로 준다. 그래서 $n$을 두 배로 늘리면 $2\bar X$는 1/2, UMVUE는 약 1/4이 된다."
+  apply={{ n: 40 }}
+  applyLabel="n = 40으로 실행"
+/>

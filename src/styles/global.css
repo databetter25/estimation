@@ -1,0 +1,574 @@
+/* ───────── Design tokens (my-design: Apple-style white) ───────── */
+:root {
+  color-scheme: light;
+  --c-blue: #0071e3;
+  --c-blue-dk: #0077ed;
+  --c-blue-lt: #34aadc;
+  --c-sky: #5ac8fa;
+  --c-grad-start: #0071e3;
+  --c-grad-mid: #34aadc;
+  --c-grad-end: #5ac8fa;
+
+  --c-green: #1a7f37;
+  --c-green-bg: #e6f4ea;
+  --c-red: #c0392b;
+  --c-red-bg: #ffeef0;
+  --c-yellow: #b07700;
+  --c-yellow-bg: #fff8e1;
+  --c-blue-bg: #e8f0fe;
+
+  --c-bg: #ffffff;
+  --c-bg-alt: #f5f5f7;
+  --c-bg-subtle: #fbfbfd;
+  --c-text-primary: #1d1d1f;
+  --c-text-secondary: #6e6e73;
+  --c-text-tertiary: #86868b;
+  --c-border: #d2d2d7;
+  --c-border-lt: #e8e8ed;
+  --c-nav-bg: rgba(255, 255, 255, 0.82);
+  --c-nav-border: rgba(0, 0, 0, 0.08);
+
+  /* chart roles (dataviz reference palette) */
+  --viz-surface: #ffffff;
+  --viz-grid: #e1e0d9;
+  --viz-axis: #c3c2b7;
+  --viz-muted: #898781;
+  --viz-ink: #1d1d1f;
+  --viz-ink-2: #52514e;
+  --viz-s1: #2a78d6;
+  --viz-s2: #eb6834;
+  --viz-s3: #1baf7a;
+  --viz-seq-1: #86b6ef;
+  --viz-seq-2: #3987e5;
+  --viz-seq-3: #1c5cab;
+  --viz-seq-4: #0d366b;
+  --viz-ring: #f5f5f7;
+  --viz-ring-2: #ebebef;
+
+  --r-xs: 6px;
+  --r-sm: 10px;
+  --r-md: 12px;
+  --r-lg: 18px;
+  --r-xl: 24px;
+  --r-pill: 980px;
+  --s-sm: 0 2px 20px rgba(0, 0, 0, 0.08);
+  --s-md: 0 8px 40px rgba(0, 0, 0, 0.12);
+  --s-tab: 0 1px 6px rgba(0, 0, 0, 0.1);
+  --fw-regular: 400;
+  --fw-medium: 500;
+  --fw-semibold: 600;
+  --fw-bold: 700;
+  --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --dur-fast: 0.2s;
+  --dur-base: 0.3s;
+  --dur-slow: 0.6s;
+  --dur-enter: 0.9s;
+
+  --font: -apple-system, 'SF Pro Display', 'Apple SD Gothic Neo', 'Pretendard', 'Malgun Gothic',
+    'Helvetica Neue', system-ui, sans-serif;
+}
+
+/* 다크 모드: OS 설정 + 토글 */
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme='light'])) {
+    color-scheme: dark;
+    --c-blue: #2997ff;
+    --c-blue-dk: #47a6ff;
+    --c-green: #4cc76b;
+    --c-green-bg: #12301b;
+    --c-red: #ff6b5e;
+    --c-red-bg: #3a1714;
+    --c-yellow: #f0b429;
+    --c-yellow-bg: #3a2c0a;
+    --c-blue-bg: #0f2a4a;
+    --c-bg: #000000;
+    --c-bg-alt: #111113;
+    --c-bg-subtle: #0a0a0b;
+    --c-text-primary: #f5f5f7;
+    --c-text-secondary: #a1a1a6;
+    --c-text-tertiary: #86868b;
+    --c-border: #3a3a3c;
+    --c-border-lt: #2c2c2e;
+    --c-nav-bg: rgba(22, 22, 23, 0.8);
+    --c-nav-border: rgba(255, 255, 255, 0.08);
+    --viz-surface: #000000;
+    --viz-grid: #2c2c2a;
+    --viz-axis: #48484a;
+    --viz-muted: #898781;
+    --viz-ink: #f5f5f7;
+    --viz-ink-2: #c3c2b7;
+    --viz-s1: #3987e5;
+    --viz-s2: #d95926;
+    --viz-s3: #199e70;
+    --viz-seq-1: #184f95;
+    --viz-seq-2: #256abf;
+    --viz-seq-3: #5598e7;
+    --viz-seq-4: #9ec5f4;
+    --viz-ring: #111113;
+    --viz-ring-2: #1c1c1e;
+    --s-sm: 0 2px 20px rgba(0, 0, 0, 0.5);
+    --s-md: 0 8px 40px rgba(0, 0, 0, 0.6);
+  }
+}
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --c-blue: #2997ff;
+  --c-blue-dk: #47a6ff;
+  --c-green: #4cc76b;
+  --c-green-bg: #12301b;
+  --c-red: #ff6b5e;
+  --c-red-bg: #3a1714;
+  --c-yellow: #f0b429;
+  --c-yellow-bg: #3a2c0a;
+  --c-blue-bg: #0f2a4a;
+  --c-bg: #000000;
+  --c-bg-alt: #111113;
+  --c-bg-subtle: #0a0a0b;
+  --c-text-primary: #f5f5f7;
+  --c-text-secondary: #a1a1a6;
+  --c-text-tertiary: #86868b;
+  --c-border: #3a3a3c;
+  --c-border-lt: #2c2c2e;
+  --c-nav-bg: rgba(22, 22, 23, 0.8);
+  --c-nav-border: rgba(255, 255, 255, 0.08);
+  --viz-surface: #000000;
+  --viz-grid: #2c2c2a;
+  --viz-axis: #48484a;
+  --viz-muted: #898781;
+  --viz-ink: #f5f5f7;
+  --viz-ink-2: #c3c2b7;
+  --viz-s1: #3987e5;
+  --viz-s2: #d95926;
+  --viz-s3: #199e70;
+  --viz-seq-1: #184f95;
+  --viz-seq-2: #256abf;
+  --viz-seq-3: #5598e7;
+  --viz-seq-4: #9ec5f4;
+  --viz-ring: #111113;
+  --viz-ring-2: #1c1c1e;
+  --s-sm: 0 2px 20px rgba(0, 0, 0, 0.5);
+  --s-md: 0 8px 40px rgba(0, 0, 0, 0.6);
+}
+
+/* ───────── Base ───────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-padding-top: 72px;
+}
+body {
+  margin: 0;
+  font-family: var(--font);
+  font-size: 1rem;
+  line-height: 1.7;
+  color: var(--c-text-primary);
+  background: var(--c-bg);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+  /* 한국어는 어절 단위로 줄바꿈 */
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+a {
+  color: var(--c-blue);
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+:focus-visible {
+  outline: 3px solid var(--c-blue);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+img,
+svg,
+canvas {
+  max-width: 100%;
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+.skip-link {
+  position: absolute;
+  left: -999px;
+  top: 8px;
+  z-index: 300;
+  background: var(--c-bg);
+  padding: 8px 16px;
+  border-radius: var(--r-pill);
+}
+.skip-link:focus {
+  left: 16px;
+}
+
+/* ───────── Layout ───────── */
+.container {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+.container.narrow {
+  max-width: 780px;
+}
+.section {
+  padding: 100px 0;
+}
+.section.alt {
+  background: var(--c-bg-alt);
+}
+main {
+  padding-top: 52px;
+}
+@media (max-width: 640px) {
+  .container {
+    padding: 0 16px;
+  }
+  .section {
+    padding: 64px 0;
+  }
+}
+
+/* ───────── Typography ───────── */
+.eyebrow {
+  font-size: 0.72rem;
+  font-weight: var(--fw-semibold);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--c-blue);
+  margin: 0 0 12px;
+}
+.grad-text {
+  background: linear-gradient(135deg, var(--c-grad-start), var(--c-grad-mid), var(--c-grad-end));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.desc {
+  font-size: 1rem;
+  color: var(--c-text-secondary);
+  line-height: 1.75;
+}
+h1,
+h2,
+h3,
+h4 {
+  line-height: 1.25;
+  margin: 0;
+}
+.page-title {
+  font-size: clamp(1.9rem, 5vw, 3.2rem);
+  font-weight: var(--fw-bold);
+  letter-spacing: -1px;
+  margin-bottom: 16px;
+}
+
+/* ───────── Prose (개념 페이지 본문) ───────── */
+.prose {
+  font-size: 1.02rem;
+  line-height: 1.85;
+}
+:where(.prose) h2 {
+  font-size: clamp(1.4rem, 3vw, 1.9rem);
+  font-weight: var(--fw-bold);
+  letter-spacing: -0.5px;
+  margin: 64px 0 16px;
+}
+:where(.prose) h3 {
+  font-size: 1.2rem;
+  font-weight: var(--fw-semibold);
+  margin: 40px 0 12px;
+}
+:where(.prose) p,
+:where(.prose) ul,
+:where(.prose) ol {
+  margin: 0 0 18px;
+}
+:where(.prose) li {
+  margin: 6px 0;
+}
+:where(.prose) strong {
+  font-weight: var(--fw-semibold);
+}
+:where(.prose) blockquote {
+  margin: 24px 0;
+  padding: 18px 24px;
+  background: var(--c-bg-alt);
+  border-radius: var(--r-md);
+  border-left: 4px solid var(--c-blue);
+  color: var(--c-text-primary);
+}
+:where(.prose) blockquote p:last-child {
+  margin-bottom: 0;
+}
+:where(.prose) table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 24px 0;
+  font-size: 0.92rem;
+  display: block;
+  overflow-x: auto;
+}
+:where(.prose) th,
+:where(.prose) td {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--c-border-lt);
+  text-align: left;
+  vertical-align: top;
+}
+:where(.prose) th {
+  font-weight: var(--fw-semibold);
+  color: var(--c-text-secondary);
+  font-size: 0.82rem;
+  white-space: nowrap;
+}
+:where(.prose) code {
+  font-size: 0.88em;
+  background: var(--c-bg-alt);
+  padding: 2px 6px;
+  border-radius: var(--r-xs);
+}
+:where(.prose) details {
+  margin: 24px 0;
+  border: 1px solid var(--c-border-lt);
+  border-radius: var(--r-md);
+  padding: 0 20px;
+  background: var(--c-bg-subtle);
+}
+:where(.prose) details[open] {
+  padding-bottom: 12px;
+}
+:where(.prose) summary {
+  cursor: pointer;
+  padding: 14px 0;
+  font-weight: var(--fw-semibold);
+  color: var(--c-text-primary);
+}
+:where(.prose) hr {
+  border: none;
+  border-top: 1px solid var(--c-border-lt);
+  margin: 48px 0;
+}
+.katex-display {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 4px 0;
+}
+
+/* ───────── Buttons ───────── */
+.btn-filled,
+.btn-outline,
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: inherit;
+  font-size: 0.92rem;
+  font-weight: var(--fw-medium);
+  border-radius: var(--r-pill);
+  cursor: pointer;
+  text-decoration: none !important;
+  transition: background var(--dur-fast), transform var(--dur-fast), border-color var(--dur-fast);
+}
+.btn-filled {
+  padding: 13px 28px;
+  background: var(--c-blue);
+  color: #fff;
+  border: none;
+}
+.btn-filled:hover {
+  background: var(--c-blue-dk);
+  transform: scale(1.02);
+}
+.btn-filled:disabled {
+  opacity: 0.55;
+  cursor: progress;
+  transform: none;
+}
+.btn-filled.sm,
+.btn-outline.sm {
+  padding: 9px 20px;
+  font-size: 0.82rem;
+}
+.btn-filled.lg {
+  padding: 16px 36px;
+  font-size: 1rem;
+}
+.btn-outline {
+  padding: 12px 26px;
+  color: var(--c-text-primary);
+  background: transparent;
+  border: 1px solid var(--c-border);
+}
+.btn-outline:hover {
+  background: var(--c-bg-alt);
+}
+.btn-ghost {
+  padding: 12px 8px;
+  color: var(--c-blue);
+  background: transparent;
+  border: none;
+}
+
+/* ───────── Badges ───────── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 12px;
+  border-radius: var(--r-pill);
+  font-size: 0.72rem;
+  font-weight: var(--fw-semibold);
+  white-space: nowrap;
+}
+.badge-blue {
+  background: var(--c-blue-bg);
+  color: var(--c-blue);
+}
+.badge-green {
+  background: var(--c-green-bg);
+  color: var(--c-green);
+}
+.badge-red {
+  background: var(--c-red-bg);
+  color: var(--c-red);
+}
+.badge-yellow {
+  background: var(--c-yellow-bg);
+  color: var(--c-yellow);
+}
+.badge-gray {
+  background: var(--c-bg-alt);
+  color: var(--c-text-secondary);
+}
+.chip {
+  display: inline-block;
+  padding: 8px 20px;
+  background: var(--c-bg-alt);
+  border: 1px solid var(--c-border-lt);
+  border-radius: var(--r-pill);
+  font-size: 0.78rem;
+  font-weight: var(--fw-medium);
+  color: var(--c-text-secondary);
+}
+
+/* ───────── Cards ───────── */
+.feat-card {
+  background: var(--c-bg);
+  border: 1px solid var(--c-border-lt);
+  border-radius: var(--r-lg);
+  padding: 32px 28px;
+  transition: box-shadow var(--dur-base), border-color var(--dur-base);
+}
+.feat-card:hover {
+  box-shadow: var(--s-md);
+  border-color: var(--c-border);
+}
+
+/* ───────── Tabs (segmented) ───────── */
+.tab-nav {
+  display: inline-flex;
+  flex-wrap: wrap;
+  background: var(--c-bg-alt);
+  border-radius: var(--r-md);
+  padding: 4px;
+  gap: 2px;
+}
+.tab-btn {
+  padding: 8px 18px;
+  border: none;
+  background: transparent;
+  border-radius: var(--r-sm);
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: var(--fw-medium);
+  color: var(--c-text-secondary);
+  cursor: pointer;
+}
+.tab-btn[aria-pressed='true'],
+.tab-btn.active {
+  background: var(--c-bg);
+  color: var(--c-text-primary);
+  box-shadow: var(--s-tab);
+}
+
+/* ───────── Progress ───────── */
+.prog-track {
+  height: 5px;
+  background: var(--c-border-lt);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.prog-fill {
+  height: 100%;
+  border-radius: 10px;
+  width: 0;
+  background: linear-gradient(90deg, var(--c-grad-start), var(--c-grad-mid));
+  transition: width var(--dur-fast) var(--ease-out);
+}
+
+/* ───────── Motion ───────── */
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity var(--dur-slow) var(--ease-spring), transform var(--dur-slow) var(--ease-spring);
+}
+.reveal.vis {
+  opacity: 1;
+  transform: none;
+}
+.hero-el {
+  opacity: 0;
+  animation: fadeUp var(--dur-enter) var(--ease-spring) forwards;
+}
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .reveal,
+  .hero-el {
+    opacity: 1;
+    transform: none;
+    animation: none;
+    transition: none;
+  }
+}
+
+/* ───────── Chart tooltip ───────── */
+.viz-tip {
+  position: fixed;
+  z-index: 400;
+  pointer-events: none;
+  background: var(--c-bg);
+  color: var(--c-text-primary);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-sm);
+  box-shadow: var(--s-sm);
+  padding: 8px 12px;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  font-variant-numeric: tabular-nums;
+  opacity: 0;
+  transition: opacity 0.12s;
+  max-width: 260px;
+}
+.viz-tip.show {
+  opacity: 1;
+}

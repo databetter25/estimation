@@ -1,0 +1,156 @@
+---
+/** DOC-3: MME/MLE → 충분성·완비성 → 라오-블랙웰/레만-셰페 → UMVUE 흐름도 (가로/세로 두 배치) */
+---
+
+<figure class="flow" aria-labelledby="flow-cap">
+  <svg class="flow-h" viewBox="0 0 760 250" role="img" aria-labelledby="flow-cap">
+    <defs>
+      <marker id="arrow-h" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" class="f-arrowhead"></path>
+      </marker>
+    </defs>
+    <text x="110" y="18" class="f-col">후보 추정량 도출</text>
+    <text x="400" y="18" class="f-col">이론적 검증·최적화</text>
+    <text x="660" y="18" class="f-col">목표</text>
+
+    <rect x="20" y="36" width="180" height="64" rx="12" class="f-box"></rect>
+    <text x="110" y="62" class="f-t">적률추정법 (MME)</text>
+    <text x="110" y="82" class="f-s">직관적, 계산이 쉬움</text>
+
+    <rect x="20" y="150" width="180" height="64" rx="12" class="f-box"></rect>
+    <text x="110" y="176" class="f-t">최대가능도추정법 (MLE)</text>
+    <text x="110" y="196" class="f-s">점근적 최적성, 불변성</text>
+
+    <line x1="110" y1="102" x2="110" y2="148" class="f-line dashed" marker-start="url(#arrow-h)" marker-end="url(#arrow-h)"></line>
+    <text x="118" y="129" class="f-s" style="text-anchor:start">비교·보완</text>
+
+    <rect x="290" y="36" width="220" height="64" rx="12" class="f-box"></rect>
+    <text x="400" y="62" class="f-t">충분성·완비성 확인</text>
+    <text x="400" y="82" class="f-s">네이만 분해 → 완비충분통계량 T</text>
+
+    <rect x="290" y="150" width="220" height="64" rx="12" class="f-box"></rect>
+    <text x="400" y="176" class="f-t">라오-블랙웰 / 레만-셰페</text>
+    <text x="400" y="196" class="f-s">E[W | T] 조건부화, 편향 보정</text>
+
+    <rect x="580" y="93" width="160" height="64" rx="12" class="f-goal"></rect>
+    <text x="660" y="119" class="f-t goal">UMVUE</text>
+    <text x="660" y="139" class="f-s goal">유한 표본의 최적</text>
+
+    <path d="M200,68 H288" class="f-line" marker-end="url(#arrow-h)"></path>
+    <path d="M200,182 H288" class="f-line" marker-end="url(#arrow-h)"></path>
+    <path d="M400,100 V148" class="f-line" marker-end="url(#arrow-h)"></path>
+    <path d="M510,182 H545 V125 H578" class="f-line" marker-end="url(#arrow-h)"></path>
+    <path d="M110,214 V236 H660 V159" class="f-line dashed" marker-end="url(#arrow-h)"></path>
+    <text x="385" y="228" class="f-s">MLE가 T의 함수이면서 불편이면 → 그대로 UMVUE</text>
+  </svg>
+
+  <svg class="flow-v" viewBox="0 0 340 520" role="img" aria-labelledby="flow-cap">
+    <defs>
+      <marker id="arrow-v" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" class="f-arrowhead"></path>
+      </marker>
+    </defs>
+    <rect x="10" y="10" width="150" height="64" rx="12" class="f-box"></rect>
+    <text x="85" y="36" class="f-t">MME</text>
+    <text x="85" y="56" class="f-s">직관적, 계산이 쉬움</text>
+    <rect x="180" y="10" width="150" height="64" rx="12" class="f-box"></rect>
+    <text x="255" y="36" class="f-t">MLE</text>
+    <text x="255" y="56" class="f-s">점근적 최적성</text>
+    <path d="M162,42 H178" class="f-line dashed"></path>
+
+    <path d="M170,76 V118" class="f-line" marker-end="url(#arrow-v)"></path>
+    <rect x="40" y="120" width="260" height="64" rx="12" class="f-box"></rect>
+    <text x="170" y="146" class="f-t">충분성·완비성 확인</text>
+    <text x="170" y="166" class="f-s">네이만 분해 → 완비충분통계량 T</text>
+
+    <path d="M170,186 V228" class="f-line" marker-end="url(#arrow-v)"></path>
+    <rect x="40" y="230" width="260" height="64" rx="12" class="f-box"></rect>
+    <text x="170" y="256" class="f-t">라오-블랙웰 / 레만-셰페</text>
+    <text x="170" y="276" class="f-s">E[W | T] 조건부화, 편향 보정</text>
+
+    <path d="M170,296 V338" class="f-line" marker-end="url(#arrow-v)"></path>
+    <rect x="70" y="340" width="200" height="64" rx="12" class="f-goal"></rect>
+    <text x="170" y="366" class="f-t goal">UMVUE</text>
+    <text x="170" y="386" class="f-s goal">유한 표본의 최적</text>
+
+    <text x="170" y="440" class="f-s">MLE가 T의 함수이면서 불편이면</text>
+    <text x="170" y="458" class="f-s">그 MLE가 곧 UMVUE (예: 정규분포의 X̄)</text>
+  </svg>
+  <figcaption id="flow-cap">MME와 MLE로 후보를 만들고, 완비충분통계량으로 다듬어 UMVUE에 도달한다.</figcaption>
+</figure>
+
+<style>
+  .flow {
+    margin: 32px 0;
+    padding: 20px;
+    background: var(--c-bg-subtle);
+    border: 1px solid var(--c-border-lt);
+    border-radius: var(--r-lg);
+  }
+  .flow svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    font-family: var(--font);
+  }
+  .flow-v {
+    display: none !important;
+    max-width: 380px;
+    margin: 0 auto;
+  }
+  @media (max-width: 640px) {
+    .flow-h {
+      display: none !important;
+    }
+    .flow-v {
+      display: block !important;
+    }
+  }
+  .flow figcaption {
+    font-size: 0.8rem;
+    color: var(--c-text-secondary);
+    margin-top: 10px;
+    text-align: center;
+  }
+  .f-col {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    fill: var(--c-text-tertiary);
+    text-anchor: middle;
+  }
+  .f-box {
+    fill: var(--c-bg);
+    stroke: var(--c-border);
+    stroke-width: 1;
+  }
+  .f-goal {
+    fill: var(--c-blue);
+  }
+  .f-t {
+    font-size: 14px;
+    font-weight: 600;
+    fill: var(--c-text-primary);
+    text-anchor: middle;
+  }
+  .f-s {
+    font-size: 11.5px;
+    fill: var(--c-text-secondary);
+    text-anchor: middle;
+  }
+  .f-t.goal,
+  .f-s.goal {
+    fill: #fff;
+  }
+  .f-line {
+    fill: none;
+    stroke: var(--c-text-tertiary);
+    stroke-width: 1.5;
+  }
+  .f-line.dashed {
+    stroke-dasharray: 5 4;
+  }
+  .f-arrowhead {
+    fill: var(--c-text-tertiary);
+  }
+</style>

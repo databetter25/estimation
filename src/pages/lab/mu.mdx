@@ -1,0 +1,28 @@
+---
+layout: ../../layouts/Chapter.astro
+title: "실험실: 정규분포 위치 μ"
+path: lab/mu
+wide: true
+lead: X ~ N(μ=10, σ²=4), n = 25. 네 추정량 모두 불편이다. 그런데 과녁 위의 퍼짐은 크게 다르다. 불편성만으로는 좋은 추정량을 가를 수 없다는 것을 확인한다.
+---
+
+import Lab from '../../components/Lab.astro';
+import Question from '../../components/Question.astro';
+
+<Lab lab="mu" />
+
+## 결과 읽기
+
+- **표본평균 $\bar X$**는 MLE이자 UMVUE다. 분산 $\sigma^2/n = 0.16$이 크래머-라오 하한(CRLB)과 같아 더 줄일 수 없다. → **과녁 (a)**
+- **10% 절사평균**은 $\bar X$보다 분산이 4% 정도 클 뿐이다(약 0.167). 판정 규칙상 (a)지만, 원천 자료에서는 "(a)와 (c) 사이"로 분류한 경계 사례다. 대신 이상치가 섞이면 $\bar X$보다 훨씬 튼튼하다. [6장](/limits)에서 확인한다.
+- **표본중앙값**은 분산이 $\bar X$의 약 1.57배다. → **과녁 (c)**
+- **중앙범위**는 양 끝 두 값만 쓰므로 분산이 가장 크다. $n = 25$에서 약 0.53으로 $\bar X$의 3배가 넘는다. → **과녁 (c)**
+
+<Question
+  q="$n$을 25에서 200으로 늘리면, 중앙값의 분산 ÷ $\bar X$의 분산 비율은 어떻게 될까?"
+  options={['1에 가까워진다', '약 1.57에 머문다', '더 커진다']}
+  answer={1}
+  explain="두 분산이 모두 $1/n$ 속도로 줄기 때문에 비율은 $n$과 상관없이 $\pi/2 \approx 1.57$ 근처에 머문다. 이것이 점근 상대효율(asymptotic relative efficiency)이다. 반면 중앙범위는 $\bar X$보다 느리게 줄어 비율이 오히려 커진다."
+  apply={{ n: 200 }}
+  applyLabel="n = 200으로 실행"
+/>

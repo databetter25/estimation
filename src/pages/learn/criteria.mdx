@@ -1,0 +1,56 @@
+---
+layout: ../../layouts/Chapter.astro
+title: 좋은 추정량의 기준과 과녁
+path: learn/criteria
+lead: 같은 실험을 B번 반복해 얻은 추정치를 과녁 위에 찍는다. 과녁의 정중앙은 참 모수 θ다. 탄착군이 어디에 모이고 얼마나 퍼지는지가 곧 추정량의 성적표다.
+---
+
+import ShootDemo from '../../components/ShootDemo.astro';
+import TryIt from '../../components/TryIt.astro';
+
+## 평가 기준 세 가지
+
+추정량 $\hat\theta$가 손에 쥐어졌을 때 그것이 좋은지 나쁜지 검사하는 체크리스트다.
+
+| 기준 | 질문 | 수식 |
+| --- | --- | --- |
+| 불편성(Unbiasedness) | 평균적으로 참값을 맞히는가? | $E[\hat\theta] = \theta$ |
+| 효율성(Efficiency) | 다른 추정량보다 분산이 작은가? | $\mathrm{Var}(\hat\theta) \le \mathrm{Var}(\tilde\theta)$ |
+| 일치성(Consistency) | 표본이 커지면 참값으로 수렴하는가? | $\hat\theta \xrightarrow{p} \theta$ |
+
+중요한 점이 하나 있다. 이 기준들은 **"그런 추정량을 어떻게 만드는가"는 알려 주지 않는다.** 만드는 법은 [2장](/learn/methods)의 MME·MLE가 맡는다.
+
+불편성과 효율성은 평균제곱오차(Mean Squared Error, MSE) 하나로 묶인다.
+
+$$
+\mathrm{MSE}(\hat{\theta}) = E\big[(\hat{\theta} - \theta)^2\big] = \underbrace{\mathrm{Var}(\hat{\theta})}_{\text{퍼짐}} + \underbrace{\big[\mathrm{Bias}(\hat{\theta})\big]^2}_{\text{중심의 어긋남}}
+$$
+
+## 과녁 세 가지
+
+| 과녁 | 모양 | 편향 | 분산 | MSE |
+| --- | --- | --- | --- | --- |
+| **(a)** 불편·고효율 | 정중앙에 조밀하게 모인다 | $\approx 0$ | 작다 | 최소 수준 |
+| **(b)** 편향·고효율 | 중심에서 벗어났지만 촘촘하다 | $\neq 0$ | 작다 | 편향의 비중이 크다 |
+| **(c)** 불편·저효율 | 중심 주위에 넓게 흩어진다 | $\approx 0$ | 크다 | 분산의 비중이 크다 |
+
+> 사이트는 이 분류를 자동으로 판정한다. 편향이 몬테카를로 표준오차의 2배를 넘고 표준편차의 20%를 넘으면 "편향", 분산이 같은 실험 안 최소분산의 1.2배 이하면 "고효율"이다. 둘 다 아니면 (d) 편향·저효율로 표시한다.
+
+## 직접 쏴 보기
+
+균등분포 $U(0,\theta)$의 상한 $\theta = 10$을 세 추정량으로 겨냥한다. [2장](/learn/methods)에서 본 세 추정량이 과녁 세 가지에 하나씩 대응한다.
+
+- $\frac{n+1}{n}X_{(n)}$ (UMVUE) → **(a)**
+- $X_{(n)}$ (MLE) → **(b)**: 항상 $\theta$보다 작으므로 탄착군이 왼쪽 아래로 밀린다
+- $2\bar X$ (MME) → **(c)**
+
+[한 발 쏘기]를 몇 번 누른 뒤 [300발 연속]을 눌러 보자.
+
+<ShootDemo />
+
+### 무엇을 봐야 하나
+
+- **(b)의 MSE가 (a)보다 크다.** 이 예에서 $X_{(n)}$의 MSE는 약 0.43, UMVUE는 약 0.23이다. 편향을 보정하는 비용(분산 증가)보다 편향 제거의 이득이 더 크기 때문이다.
+- 그렇다고 "(b)는 언제나 손해"는 아니다. 정규분포의 분산 추정에서는 편향이 있는 MLE가 불편추정량보다 MSE가 **작다**. 같은 (b) 모양이라도 편향과 분산의 크기에 따라 승패가 갈린다.
+
+<TryIt to="lab/sigma2" label="편향이 이기는 경우 보러 가기" note="정규분포 σ² 실험실에서 MSE 분해 막대를 확인하세요." />

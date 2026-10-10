@@ -1,0 +1,115 @@
+---
+/** 생각해 볼 질문 (LAB-4): 예측을 고른 뒤 실험으로 확인 */
+import { texText } from '../lib/tex';
+interface Props {
+  q: string;
+  options: string[];
+  answer: number;
+  explain: string;
+  apply?: Record<string, number | string>;
+  applyLabel?: string;
+}
+const { q, options, answer, explain, apply, applyLabel = '실험으로 확인' } = Astro.props;
+---
+
+<aside class="question" data-answer={answer}>
+  <p class="q-eyebrow">생각해 볼 질문</p>
+  <p class="q-text" set:html={texText(q)} />
+  <div class="q-options" role="group" aria-label="예측 선택">
+    {options.map((o, i) => <button type="button" class="q-opt" data-i={i} set:html={texText(o)} />)}
+  </div>
+  <div class="q-result" hidden>
+    <p class="q-verdict" aria-live="polite"></p>
+    <p class="q-explain" set:html={texText(explain)} />
+    {apply && <button type="button" class="btn-filled sm" data-apply={JSON.stringify(apply)}>{applyLabel}</button>}
+  </div>
+</aside>
+
+<script>
+  document.querySelectorAll<HTMLElement>('.question').forEach((box) => {
+    const answer = +box.dataset.answer!;
+    const result = box.querySelector<HTMLElement>('.q-result')!;
+    const verdict = box.querySelector<HTMLElement>('.q-verdict')!;
+    box.querySelectorAll<HTMLButtonElement>('.q-opt').forEach((btn) =>
+      btn.addEventListener('click', () => {
+        box.querySelectorAll('.q-opt').forEach((b) => b.removeAttribute('data-state'));
+        const ok = +btn.dataset.i! === answer;
+        btn.dataset.state = ok ? 'right' : 'wrong';
+        box.querySelector<HTMLElement>(`.q-opt[data-i="${answer}"]`)!.dataset.state = 'right';
+        verdict.textContent = ok ? '맞았습니다.' : '예측과 다릅니다. 정답은 초록색 보기입니다.';
+        result.hidden = false;
+      }),
+    );
+    box.querySelector<HTMLButtonElement>('[data-apply]')?.addEventListener('click', (e) => {
+      const detail = JSON.parse((e.currentTarget as HTMLElement).dataset.apply!);
+      document.dispatchEvent(new CustomEvent('lab:apply', { detail }));
+    });
+  });
+</script>
+
+<style>
+  .question {
+    margin: 32px 0;
+    padding: 24px 26px;
+    border: 1px solid var(--c-border-lt);
+    border-radius: var(--r-lg);
+    background: var(--c-bg-subtle);
+  }
+  .q-eyebrow {
+    font-size: 0.72rem;
+    font-weight: var(--fw-semibold);
+    letter-spacing: 2px;
+    color: var(--c-blue);
+    margin: 0 0 8px;
+  }
+  .q-text {
+    font-weight: var(--fw-semibold);
+    margin: 0 0 14px;
+  }
+  .q-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .q-opt {
+    font: inherit;
+    font-size: 0.88rem;
+    padding: 9px 18px;
+    border: 1px solid var(--c-border);
+    border-radius: var(--r-pill);
+    background: var(--c-bg);
+    color: var(--c-text-primary);
+    cursor: pointer;
+  }
+  .q-opt:hover {
+    background: var(--c-bg-alt);
+  }
+  .q-opt[data-state='right'] {
+    border-color: var(--c-green);
+    background: var(--c-green-bg);
+    color: var(--c-green);
+  }
+  .q-opt[data-state='right']::before {
+    content: '✓ ';
+  }
+  .q-opt[data-state='wrong'] {
+    border-color: var(--c-red);
+    background: var(--c-red-bg);
+    color: var(--c-red);
+  }
+  .q-opt[data-state='wrong']::before {
+    content: '✕ ';
+  }
+  .q-result {
+    margin-top: 16px;
+  }
+  .q-verdict {
+    font-weight: var(--fw-semibold);
+    margin: 0 0 6px;
+  }
+  .q-explain {
+    font-size: 0.92rem;
+    color: var(--c-text-secondary);
+    margin: 0 0 14px;
+  }
+</style>

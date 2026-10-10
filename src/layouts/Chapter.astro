@@ -1,0 +1,135 @@
+---
+import Base from './Base.astro';
+import { CHAPTERS, chapterIndex } from '../data/chapters';
+
+interface Props {
+  frontmatter: {
+    title: string;
+    path: string;
+    lead?: string;
+    /** 실험실처럼 넓은 화면이 필요한 페이지 */
+    wide?: boolean;
+  };
+}
+const { frontmatter: fm } = Astro.props;
+const idx = chapterIndex(fm.path);
+const ch = CHAPTERS[idx];
+const prev = idx > 0 ? CHAPTERS[idx - 1] : null;
+const next = idx >= 0 && idx < CHAPTERS.length - 1 ? CHAPTERS[idx + 1] : null;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+---
+
+<Base title={fm.title} description={fm.lead ?? ch?.summary} current={fm.path}>
+  <header class="ch-header">
+    <div class={`container ${fm.wide ? '' : 'narrow'}`}>
+      {ch && <p class="eyebrow hero-el" style="animation-delay:.1s">{ch.num.padStart(2, '0')} — {ch.kind}</p>}
+      <h1 class="page-title hero-el" style="animation-delay:.2s">{fm.title}</h1>
+      {fm.lead && <p class="desc hero-el" style="animation-delay:.3s">{fm.lead}</p>}
+      {
+        ch && (
+          <div class="ch-progress hero-el" style="animation-delay:.4s" aria-label={`전체 ${CHAPTERS.length}장 중 ${idx + 1}번째`}>
+            {CHAPTERS.map((c, i) => (
+              <a href={`${base}/${c.path}`} class={i === idx ? 'on' : i < idx ? 'done' : ''} title={`${c.num}. ${c.title}`}>
+                <span class="sr-only">{c.num}. {c.title}</span>
+              </a>
+            ))}
+          </div>
+        )
+      }
+    </div>
+  </header>
+
+  <div class={`container ${fm.wide ? '' : 'narrow'} ch-body`}>
+    <article class="prose">
+      <slot />
+    </article>
+
+    <nav class="pager" aria-label="이전·다음 장">
+      {
+        prev ? (
+          <a class="pager-card" href={`${base}/${prev.path}`}>
+            <span class="pager-dir">← 이전</span>
+            <span class="pager-title">{prev.num}. {prev.title}</span>
+          </a>
+        ) : (
+          <span />
+        )
+      }
+      {
+        next && (
+          <a class="pager-card next" href={`${base}/${next.path}`}>
+            <span class="pager-dir">다음 →</span>
+            <span class="pager-title">{next.num}. {next.title}</span>
+          </a>
+        )
+      }
+    </nav>
+  </div>
+</Base>
+
+<style>
+  .ch-header {
+    padding: 72px 0 32px;
+    background: linear-gradient(180deg, var(--c-bg-alt), var(--c-bg));
+  }
+  .ch-progress {
+    display: flex;
+    gap: 4px;
+    margin-top: 28px;
+  }
+  .ch-progress a {
+    flex: 1;
+    height: 4px;
+    border-radius: 4px;
+    background: var(--c-border-lt);
+  }
+  .ch-progress a.done {
+    background: var(--c-sky);
+  }
+  .ch-progress a.on {
+    background: var(--c-blue);
+  }
+  .ch-body {
+    padding-bottom: 100px;
+  }
+  .pager {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 80px;
+  }
+  .pager-card {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 20px 22px;
+    border: 1px solid var(--c-border-lt);
+    border-radius: var(--r-lg);
+    text-decoration: none !important;
+    transition: box-shadow var(--dur-base), border-color var(--dur-base);
+  }
+  .pager-card:hover {
+    box-shadow: var(--s-md);
+    border-color: var(--c-border);
+  }
+  .pager-card.next {
+    text-align: right;
+    grid-column: 2;
+  }
+  .pager-dir {
+    font-size: 0.76rem;
+    color: var(--c-text-tertiary);
+  }
+  .pager-title {
+    font-weight: var(--fw-semibold);
+    color: var(--c-text-primary);
+  }
+  @media (max-width: 560px) {
+    .pager {
+      grid-template-columns: 1fr;
+    }
+    .pager-card.next {
+      grid-column: 1;
+    }
+  }
+</style>
