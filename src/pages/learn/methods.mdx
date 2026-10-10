@@ -38,7 +38,7 @@ $$
 \hat\theta_{\mathrm{MLE}} = \arg\max_\theta L(\theta \mid \mathbf{x}) = \arg\max_\theta \prod_{i=1}^n f(x_i \mid \theta)
 $$
 
-정칙조건(regularity conditions) 아래에서 MLE는 일치성, 점근적 정규성, 점근적 효율성을 가진다. 또 $g(\theta)$의 MLE는 그냥 $g(\hat\theta_{\mathrm{MLE}})$라는 **불변성(invariance)**도 있다.
+정칙조건(regularity conditions) 아래에서 MLE는 일치성, 점근적 정규성, 점근적 효율성을 가진다. 또 $g(\theta)$의 MLE는 그냥 $g(\hat\theta_{\mathrm{MLE}})$라는 **불변성**(invariance)도 있다.
 
 > **정규분포 예**: $N(\mu,\sigma^2)$에서 $\hat\mu = \bar{X}$, $\hat\sigma^2 = \frac{1}{n}\sum(X_i - \bar X)^2$. 분모가 $n$이라 $E[\hat\sigma^2] = \frac{n-1}{n}\sigma^2$로 **과소추정 편향**이 생긴다.
 >
@@ -52,7 +52,7 @@ $$
 f(\mathbf{x}\mid\theta) = g\big(T(\mathbf{x}) \mid \theta\big)\, h(\mathbf{x})
 $$
 
-**완비성(Completeness)**은 "$E_\theta[g(T)] = 0$이 모든 $\theta$에서 성립하면 $g(T) = 0$"이라는 성질이다. 지수족(exponential family)이라면 자연모수 공간이 열린 집합을 포함할 때 완비충분통계량이 바로 나온다.
+**완비성**(Completeness)은 "$E_\theta[g(T)] = 0$이 모든 $\theta$에서 성립하면 $g(T) = 0$"이라는 성질이다. 지수족(exponential family)이라면 자연모수 공간이 열린 집합을 포함할 때 완비충분통계량이 바로 나온다.
 
 | 모형 | 완비충분통계량 |
 | --- | --- |
